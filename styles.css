@@ -49,10 +49,6 @@ p,li {
 	right: 0;
 
 	width: 100%;
-	/*height: 100%;*/
-
-	/*mask-image: linear-gradient(180deg, #000000FF 29.27%, rgba(255, 255, 255, 0) 75.62%),
-		url("img/space-background.png");*/
 
 	-webkit-mask-image: linear-gradient(to top, transparent 5%, black 100%);
   	mask-image: linear-gradient(to top, transparent 5%, black 100%);*/
@@ -147,8 +143,6 @@ p,li {
 	justify-content: space-between;
 	align-items: stretch;
 	width: 100%;
-	/*flex-wrap: wrap;*/
-	/*margin-bottom: 190px;*/
 }
 
 .main-info__avatar-container {
