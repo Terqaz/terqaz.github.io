@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Заполнение резюме</title>
+
+	<script src="https://unpkg.com/vue@next"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+<body>
+	<div id="app">
+		<div class="d-flex flex-row w-100">
+			<!-- Форма -->
+			<div class="summary-form__wrapper container-fluid w-50 p-3">
+				<form id="summaryForm" class="summary-form flex-column mx-auto rounded-3 overflow-hidden px-2"
+					name="form">
+					<h4 class="mx-auto text-center">Заполните данные о себе</h4>
+					<div class="summary-form__body text-dark d-flex flex-column">
+						<label for="summaryFormProfession">Профессия</label>
+						<input type="text" v-model="summaryFormData.profession" id="summaryFormProfession"
+							class="form-control" placeholder="Название профессии">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.profession, constraints().profession)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormCity">Город проживания</label>
+						<input type="text" v-model="summaryFormData.city" id="summaryFormCity" class="form-control"
+							placeholder="Название города">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.city, constraints().city)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormAvatarUrl">Ссылка на фото</label>
+						<input type="text" v-model="summaryFormData.avatarUrl" id="summaryFormAvatarUrl"
+							class="form-control" placeholder="http://example.site">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.avatarUrl, constraints().avatarUrl)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormLastName">Фамилия</label>
+						<input type="text" v-model="summaryFormData.lastName" id="summaryFormLastName"
+							class="form-control" placeholder="Иванов">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.lastName, constraints().lastName)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormFirstName">Имя</label>
+						<input type="text" v-model="summaryFormData.firstName" id="summaryFormFirstName"
+							class="form-control" placeholder="Иван">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.firstName, constraints().firstName)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormPatronymic">Отчество</label>
+						<input type="text" v-model="summaryFormData.patronymic" id="summaryFormPatronymic"
+							class="form-control" placeholder="Иванович">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.patronymic, constraints().patronymic)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormPhone">Телефон</label>
+						<input type="text" v-model="summaryFormData.phone" id="summaryFormPhone" class="form-control"
+							placeholder="9001002030">
+						<div class="form-text">Сокращенный (6 цифр) или полный без кода страны (10 цифр)</div>
+
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.phone, constraints().phone)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormEmail">Email</label>
+						<input type="text" v-model="summaryFormData.email" id="summaryFormEmail" class="form-control"
+							placeholder="example@some.site">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.email, constraints().email)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormBirthday">Дата рождения</label>
+						<input type="date" v-model="summaryFormData.birthday" id="summaryFormBirthday">
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.birthday, constraints().birthday)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormEducation">Образование</label>
+						<select v-model="summaryFormData.education" name="education" id="summaryFormEducation"
+							class="form-control">
+							<option value="secondary">Среднее</option>
+							<option value="secondarySpecial">Среднее специальное</option>
+							<option value="incompleteHigher">Неоконченное высшее</option>
+							<option value="higher">Высшее</option>
+						</select>
+						<template v-if="summaryFormData.education && summaryFormData.education !== 'secondary'">
+
+							<label for="summaryFormEducationInstitution">Учебное заведение</label>
+							<input type="text" v-model="summaryFormData.educationData.institution"
+								id="summaryFormEducationInstitution" class="form-control">
+							<ul class="invalid-feedback d-block">
+								<li
+									v-for="message in formatErrors(summaryFormData.educationData.institution, constraints().institution)">
+									{{ message }}
+								</li>
+							</ul>
+
+							<label for="summaryFormEducationFaculty">Факультет</label>
+							<input type="text" v-model="summaryFormData.educationData.faculty"
+								id="summaryFormEducationInstitution" class="form-control">
+							<ul class="invalid-feedback d-block">
+								<li
+									v-for="message in formatErrors(summaryFormData.educationData.faculty, constraints().faculty)">
+									{{ message }}
+								</li>
+							</ul>
+
+							<label for="summaryFormEducationSpecialization">Специализация</label>
+							<input type="text" v-model="summaryFormData.educationData.specialization"
+								id="summaryFormEducationInstitution" class="form-control">
+							<ul class="invalid-feedback d-block">
+								<li
+									v-for="message in formatErrors(summaryFormData.educationData.specialization, constraints().specialization)">
+									{{ message }}
+								</li>
+							</ul>
+
+							<label for="summaryFormEducationGraduationYear">Год окончания</label>
+							<input type="number" v-model="summaryFormData.educationData.graduationYear"
+								id="summaryFormEducationInstitution" class="form-control" min="1950"
+								v-bind:max="new Date().getFullYear() + 6">
+							<ul class="invalid-feedback d-block">
+								<li
+									v-for="message in formatErrors(summaryFormData.educationData.graduationYear, constraints().graduationYear)">
+									{{ message }}
+								</li>
+							</ul>
+						</template>
+
+						<label for="summaryFormDesiredSalary">Желаемая зарплата</label>
+						<input type="number" v-model="summaryFormData.desiredSalary" id="summaryFormDesiredSalary"
+							class="form-control">
+
+						<label for="summaryFormKeySkills">Ключевые навыки</label>
+						<textarea v-model="summaryFormData.keySkills" id="summaryFormKeySkills" class="form-control"
+							placeholder="Symfony, Vuejs, ..."></textarea>
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.keySkills, constraints().keySkills)">
+								{{ message }}
+							</li>
+						</ul>
+
+						<label for="summaryFormAbout">О себе</label>
+						<textarea v-model="summaryFormData.about" type="text" id="summaryFormAbout" class="form-control"
+							placeholder="Попытайтесь описать себя"></textarea>
+						<ul class="invalid-feedback d-block">
+							<li v-for="message in formatErrors(summaryFormData.about, constraints().about)">
+								{{ message }}
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<!-- Резюме -->
+			<div class="summary container-fluid w-50 p-3">
+				<h4 class="mx-auto text-center">Ваше резюме</h5>
+					<div class="d-flex">
+						<img v-show="isValid(summaryFormData.avatarUrl, constraints().avatarUrl)"
+							v-bind:src="summaryFormData.avatarUrl" alt="" class="summary__avatar mx-auto">
+					</div>
+
+					<h3 v-if="isFullNameValid()">
+						{{fullName}}
+					</h3>
+
+					<h3>О себе</h3>
+					<p v-show="summaryFormData.birthday">
+						Дата рождения: {{summaryFormData.birthday}}
+					</p>
+					<p v-show="isValid(summaryFormData.city, constraints().city)">
+						г. {{summaryFormData.city}}
+					</p>
+					<p v-show="isValid(summaryFormData.about, constraints().about) && summaryFormData.about">
+						{{summaryFormData.about}}
+					</p>
+
+					<template v-if="summaryFormData.education">
+						<h3>
+							Образование
+						</h3>
+						<p>
+							Уровень: {{educationName[summaryFormData.education]}}
+						</p>
+					</template>	
+					<template v-if="summaryFormData.education && summaryFormData.education !== 'secondary'">
+						<p v-show="isValid(summaryFormData.educationData.institution, constraints().institution)">
+							Учебное заведение: {{summaryFormData.educationData.institution}}
+						</p>
+						<p v-show="isValid(summaryFormData.educationData.faculty, constraints().faculty)">
+							Факультет: {{summaryFormData.educationData.faculty}}
+						</p>
+						<p v-show="isValid(summaryFormData.educationData.specialization, constraints().specialization)">
+							Специализация: {{summaryFormData.educationData.specialization}}
+						</p>
+						<p v-show="summaryFormData.educationData.graduationYear">
+							Год окончания: {{summaryFormData.educationData.graduationYear}}
+						</p>
+					</template>
+
+					<h3>Профессиональные качества</h3>
+					<p v-show="isValid(summaryFormData.profession, constraints().profession)">
+						Профессия: {{summaryFormData.profession}}
+					</p>
+					<p v-show="summaryFormData.desiredSalary > 0">
+						Желаемая заработная плата: {{summaryFormData.desiredSalary}} ₽
+					</p>
+
+					<p
+						v-show="isValid(summaryFormData.keySkills, constraints().keySkills) && summaryFormData.keySkills">
+						Ключевые навыки: {{summaryFormData.keySkills}}
+					</p>
+
+					<h3
+						v-show="isValid(summaryFormData.phone, constraints().phone) || isValid(summaryFormData.email, constraints().email)">
+						Контакты
+					</h3>
+					<p v-show="isValid(summaryFormData.phone, constraints().phone)">
+						Телефон: {{formattedPhone}}
+					</p>
+					<p v-show="isValid(summaryFormData.email, constraints().email) && summaryFormData.email">
+						Email: {{summaryFormData.email}}
+					</p>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+		crossorigin="anonymous"></script>
+	<script>
+		const vm = Vue.createApp({
+			data() {
+				return {
+					// Данные формы
+					summaryFormData: {
+						profession: '',
+						city: '',
+						avatarUrl: '',
+						lastName: '',
+						firstName: '',
+						patronymic: '',
+						phone: '',
+						email: '',
+						birthday: '',
+						education: '',
+						educationData: {
+							institution: '',
+							faculty: '',
+							specialization: '',
+							graduationYear: ''
+						},
+						desiredSalary: '',
+						keySkills: '',
+						about: '',
+					},
+					// Возможные значения образования 
+					educationName: {
+						secondary: 'Среднее',
+						secondarySpecial: 'Среднее специальное',
+						incompleteHigher: 'Неоконченное высшее',
+						higher: 'Высшее',
+					},
+					// Регулярные выражения, применяемые при валидации
+					regexes: {
+						isAlpha: new RegExp('^[A-ЯЁ][а-яё\-]{1,32}$', 'u'),
+						isAlphaMultiWords: new RegExp('^([A-ЯЁA-Z][а-яёa-z]{1,32}|[A-ЯЁA-Z]{1,16})( ([A-ЯЁA-Z]?[а-яёa-z]{1,32}|[A-ЯЁA-Z]{1,16}))*$', 'u'),
+						isDigit: new RegExp('^[0-9]+$'),
+						city: new RegExp('^[А-ЯЁ][а-яё]{1,20}[\- ]?[А-ЯЁа-яё]{1,20}$'),
+						email: new RegExp('^[\dA-Za-z][.-_\dA-Za-z]+[\dA-Za-z]?@([-\dA-Za-z]+\.){1,2}[-A-Za-z]{2,7}$'),
+						imgUrl: new RegExp('^https?\:\/\/((www\.)?[-a-zA-Z0-9.\+]{1,256}\.[a-zA-Z0-9]{1,6})[-a-zA-Z0-9_\+.\/]+\.(jpe?g|png|svg|webp)([?][-a-zA-Z0-9%:_\+.~#&\/=]*)?$', 'gmi')
+					},
+					// Выводимые пользователю сообщения ошибок валидации
+					regexErrorMessages: {
+						isAlpha: 'Только слово на русском с заглавной буквы',
+						isAlphaMultiWords: 'Только слова на русском. Первое - с заглавной буквы',
+						isDigit: 'Только цифры',
+						city: 'Некорректное название города',
+						email: 'Некорректный email',
+						url: 'Некорректная ссылка'
+					}
+				};
+			},
+			computed: {
+				/** 
+				 * Получить полное имя (ФИО) пользователя
+				 * Returns: string - ФИО пользователя
+				 */
+				fullName() {
+					let fullName = this.summaryFormData.lastName + ' ' +
+						this.summaryFormData.firstName;
+					if (this.summaryFormData.patronymic) {
+						fullName += ' ' + this.summaryFormData.patronymic;
+					}
+					return fullName;
+				},
+
+				/** 
+				 * Добавить к номеру телефона код страны, если его длина равна 10
+				 * Returns: string - номер телефона
+				 */
+				formattedPhone: {
+					get() {
+						if (this.summaryFormData.phone.length === 10) {
+							return '+7' + this.summaryFormData.phone;
+						}
+						return this.summaryFormData.phone;
+					}
+				}
+			},
+			methods: {
+				/** 
+				 * Валидирует значения value.
+				 * Аргументы:
+				 * value: string - проверяемое значение
+				 * constraints: array<string, mixed>
+				 * Returns: bool - поле валидное или нет
+				 */
+				isValid(value, constraints) {
+					if (!constraints || !value && !constraints.required) {
+						return true;
+					} else if (constraints.required && !value) {
+						return false;
+					} else if (constraints.minLength && value.length < constraints.minLength) {
+						return false;
+					} else if (constraints.maxLength && value.length > constraints.maxLength) {
+						return false;
+					} else if (constraints.regex && !constraints.regex.test(value)) {
+						return false;
+					}
+					return true;
+				},
+				/** 
+				 * Валидирует полное имя пользова
+				 * Returns: bool - поле валидное или нет
+				 */
+				isFullNameValid() {
+					return this.isValid(this.summaryFormData.firstName, this.constraints().firstName) &&
+						this.isValid(this.summaryFormData.lastName, this.constraints().lastName) &&
+						this.isValid(this.summaryFormData.patronymic, this.constraints().patronymic);
+				},
+
+				/** 
+				 * Возвращает массив ошибок валидации
+				 * Аргументы:
+				 * value: string - проверяемое значение
+				 * constraints: array<string, mixed>
+				 * Returns: array - ошибки валидации
+				 */
+				formatErrors(value, constraints) {
+					let errors = [];
+
+					if (!constraints || !value && !constraints.required) {
+						return errors;
+					}
+					if (constraints.required && !value) {
+						errors.push('Обязательное поле');
+					}
+
+					let lenghtMessage = 'Длина - ';
+					if (constraints.minLength && value.length < constraints.minLength) {
+						lenghtMessage += ' от ' + constraints.minLength;
+					}
+					if (constraints.maxLength && value.length > constraints.maxLength) {
+						lenghtMessage += ' до ' + + constraints.maxLength;
+					}
+					if (lenghtMessage.length > 8) {
+						lenghtMessage += ' символов'
+						errors.push(lenghtMessage);
+					}
+
+					if (constraints.regex && constraints.regexErrorMessage && !constraints.regex.test(value)) {
+						errors.push(constraints.regexErrorMessage);
+					}
+
+					return errors;
+				},
+
+				/** 
+				 * Возвращает условия валидации для каждого поля 
+				 * Returns: object
+				 */
+				constraints() {
+					return {
+						profession: {
+							required: true,
+							maxLength: 200,
+							regex: this.regexes.isAlphaMultiWords,
+							regexErrorMessage: this.regexErrorMessages.isAlphaMultiWords
+						},
+						city: {
+							required: true,
+							regex: this.regexes.city,
+							regexErrorMessage: this.regexErrorMessages.city
+						},
+						avatarUrl: {
+							required: false,
+							regex: this.regexes.url,
+							regexErrorMessage: this.regexErrorMessages.url
+						},
+						lastName: {
+							required: true,
+							minLength: 2,
+							maxLength: 64,
+							regex: this.regexes.isAlpha,
+							regexErrorMessage: this.regexErrorMessages.isAlpha
+						},
+						firstName: {
+							required: true,
+							minLength: 2,
+							maxLength: 64,
+							regex: this.regexes.isAlpha,
+							regexErrorMessage: this.regexErrorMessages.isAlpha
+						},
+						patronymic: {
+							required: false,
+							minLength: 4,
+							maxLength: 64,
+							regex: this.regexes.isAlpha,
+							regexErrorMessage: this.regexErrorMessages.isAlpha
+						},
+						phone: {
+							required: true,
+							minLength: 6,
+							maxLength: 10,
+							regex: this.regexes.isDigit,
+							regexErrorMessage: this.regexErrorMessages.isDigit
+						},
+						email: {
+							required: false,
+							minLength: 5,
+							maxLength: 128,
+							regex: this.regexes.email,
+							regexErrorMessage: this.regexErrorMessages.email
+						},
+						birthday: {
+							required: true,
+						},
+						desiredSalary: {
+							required: false,
+						},
+						keySkills: {
+							required: false,
+							maxLength: 2048,
+						},
+						about: {
+							required: false,
+							minLength: 32,
+							maxLength: 2048,
+						},
+						institution: {
+							required: true,
+							maxLength: 300,
+							regex: this.regexes.isAlphaMultiWords,
+							regexErrorMessage: this.regexErrorMessages.isAlphaMultiWords
+						},
+						faculty: {
+							required: true,
+							maxLength: 150,
+							regex: this.regexes.isAlphaMultiWords,
+							regexErrorMessage: this.regexErrorMessages.isAlphaMultiWords
+						},
+						specialization: {
+							required: true,
+							maxLength: 150,
+							regex: this.regexes.isAlphaMultiWords,
+							regexErrorMessage: this.regexErrorMessages.isAlphaMultiWords
+						},
+						graduationYear: {
+							required: true
+						},
+					};
+				}
+			},
+		}).mount('#app')
+	</script>
+
+	<style>
+		p+p {
+			margin-bottom: 5px;
+		}
+
+		.summary-form__body .input-group-text {
+			background: #8E1030;
+			border: none;
+			color: white;
+		}
+
+		.summary-form {
+			max-width: 600px;
+		}
+
+		.summary-form__header {
+			background: #003A6C;
+		}
+
+		.summary-form__header__swap-btn {
+			padding: 0;
+			border: none;
+			font-size: 1.5rem;
+			background: #002D54;
+		}
+
+		.summary-form__body {
+			min-height: 30px;
+		}
+
+		.invalid-feedback {
+			font-size: 0.8rem;
+		}
+
+		.summary h3 {
+			margin-top: 1.5rem;
+		}
+
+		.summary__avatar {
+			max-width: 100%;
+			max-height: 17rem;
+		}
+	</style>
+</body>
+
+</html>
